@@ -1,0 +1,26 @@
+{
+	"file_name": {
+		# Recommendation: 1 file name maps to 1 patient 
+		"type": "string"
+	},
+	"event_name": {
+		"type": "string"
+	},
+	"event_additional_info": {
+		# Optional; contains 1 layer of objects
+		"type": "object",
+		"reference": {
+			"type": "string"
+		},
+		"comments": {
+			"type": "string"
+		}
+	},
+	"event_time": {
+		# If event is defined over a period, select most recent time
+		"type": "string"
+	},
+	"analysis_time": {
+		"type": "string"
+	}
+}
