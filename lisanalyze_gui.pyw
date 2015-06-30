@@ -139,7 +139,7 @@ class Application(tk.Frame):
 		self.resultsText.set(
 			str(
 				subprocess.check_output(
-					["python3", lisanalyzePath, "-f", filenames],
+					["python", lisanalyzePath, "-f", "-r", filenames],
 					universal_newlines=True
 				)
 			)
