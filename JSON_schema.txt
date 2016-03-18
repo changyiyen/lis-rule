@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "name": "Lab",
+  "type": "object",
+  "definitions": {
+    "entry": {
+      "lab_item": {
+        "type": "string"
+      },
+      "lab_value": {
+        "type": "string"
+      },
+      "unit": {
+        "type": "string"
+      },
+      "date": {
+        "type": "string"
+      },
+      "required": [
+        "lab_item",
+        "lab_value",
+        "unit",
+        "date"
+      ]
+    },
+    "patient_id": {
+      "type": "string"
+    }
+  },
+  "properties": {
+    "patient_id": {
+      "$ref": "#/definitions/patient_id"
+    },
+    "entry": {
+      "$ref": "#/definitions/entry"
+    }
+  }
+}

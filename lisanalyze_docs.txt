@@ -1,0 +1,109 @@
+﻿lisanalyze - automated rule-based interpretation of medical lab results
+
+Documentation for version 0.1 written by Chang-Yi Yen <changyiyen@gmail.com>
+
+Contents:
+I. Introduction
+II. Components and their interfaces
+    a. lisanalyze.py
+    b. lisanalyze_gui.py
+    c. lispublish.py
+    d. modules
+
+===
+
+I. Introduction
+
+    lisanalyze is a set of Python 3 scripts aiming to help physicians quickly
+make sense of and track the various lab results of multiple patients. It can
+optionally output the results of its analysis to an RSS2 feed. Currently it
+operates on JSON-formatted text files that contain the patient's full lab
+result history, but SQL database support is planned in the future.
+
+    In this document the name "lisanalyze" will be used to refer to the set of
+scripts as a whole, while "lisanalyze.py" will be used to refer to the main
+script itself.
+
+    Currently lisanalyze is meant to be run periodically (perhaps as a cron job)
+on a central server, but can be run locally as well. Additionally, a GUI
+(lisanalyze_gui.py) is provided for local use.
+
+    This package has a few dependencies:
+        import_labs: BeautifulSoup (for XML parsing)
+        lisanalyze and modules: Pint (for unit conversion)
+        lisanalyze_gui: Tkinter (for the widget toolkit)
+        lispublish: PyRSS2Gen (for RSS2 feed generation)
+
+    lisanalyze is licensed under the 3-clause BSD license.
+
+II. Components and their interfaces
+
+    a. lisanalyze.py
+        lisanalyze.py takes names of JSON-formatted lab result files as
+    arguments, calls various analysis modules on them, and outputs all events
+    known to have happened to those patients in JSON-formatted files bearing a
+    standard suffix.
+
+****        The JSON schema for input files is as follows:
+****        The JSON schema for output files is as follows:
+
+    b. lisanalyze_gui.py
+
+        lisanalyze_gui.py is a very simple GUI for people who don't want to use
+    the command line. It basically calls lisanalyze.py with the desired file
+    names and shows the results. It assumes that:
+        1) a Python 3 interpreter (whether on Windows or GNU/Linux) is included
+        in the user's $PATH as 'python'; and
+        2) Tkinter is installed and available.
+
+        Input files to lisanalyze_gui.py are meant to be exactly the same as
+    those provided to lisanalyze.py. Output is exactly the same as that of
+    invoking lisanalyze.py with the "human-readable" argument.
+
+        Please note that as lisanalyze is primarily meant to be run on a central
+    server, less developer attention is given to this script.
+
+    c. lispublish.py
+
+        lispublish.py takes the output files from lisanalyze.py and generates
+    RSS2 feeds in the form of XML files. It parses the output from
+    lisanalyze.py and calls PyRSS2Gen with the appropriate information.
+        If the feeds to be deployed are to be made available to clients not
+    residing on the hospital network, then it is probably advisable to secure
+    the feeds with SSL and (at least) HTTP Basic Authentication.
+    
+    d. modules
+        
+        lisanalyze can be easily extended with the use of modules. These are
+    simply Python 3 modules that are called from lisanalyze.py. Each module is
+    responsible for keeping its own internal state (more specifically, modules
+    are expected to track all analysis results relevant to that module of all
+    patients).
+        
+        Modules are required to define 3 functions:
+        
+        1) analyze(file_name, lis_struct, time, args), where file_name is a
+        string containing the name of the current input file, lis_struct is a
+        dict containing the input data (as decoded by json and with a schema as
+        defined above in the section for lisanalyze.py), time is a string
+        containing the ISO8601-formatted time at which the sample was taken, and
+        args is a dict provided by argparse that contains the arguments that
+        lisanalyze.py was called with. Returns false on correct execution.
+        
+        2) get_results(), which takes no arguments and returns a dict with a
+        schema of {file_name -> {event_time -> (event_str)}}, where file_name is
+        a string containing the name of the current input file, event_time is an
+        ISO8601-formatted time at which an event was noticed, and event_str is a
+        string which contains the name of the event and associated info.
+
+        3) passthrough(file_name, lis_struct, time, args), in which the
+        arguments are the same as those provided to analyze(), but returns a
+        tuple of the form (value, unit) that contains the value and unit of that
+        particular substance at that particular point in time. This is meant as
+        a convenience function for other modules where multiple values must be
+        considered together to be of clinical significance.
+
+        As of version 0.1 bundled modules include those for PSA, sodium,
+    potassium, AST, and ALT. Future module writers may wish to use an
+    object-oriented design using class or instance variables rather than
+    module-specific global variables to track internal state.

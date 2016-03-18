@@ -89,7 +89,7 @@ class Application(tk.Frame):
 			textvariable=self.resultsText,
 			justify=tk.LEFT,
 			wraplength=300,
-			height=20, width=40
+			height=20, width=60
 		)
 		self.resultsBox.grid()
 
@@ -125,7 +125,7 @@ class Application(tk.Frame):
 		return True
 	def runAnalyzer(self):
 		"""
-		Calls lisnalyzer.py. The runAnalyzer function is actually
+		Calls lisanalyze.py. The runAnalyzer function is actually
 		pretty generic, just a wrapper around a creation of a
 		subprocess. Might block due to the subprocess call.
 		"""
@@ -139,7 +139,7 @@ class Application(tk.Frame):
 		self.resultsText.set(
 			str(
 				subprocess.check_output(
-					["python", lisanalyzePath, "-f", "-r", filenames],
+					["python3", lisanalyzePath, "-f", filenames],
 					universal_newlines=True
 				)
 			)
